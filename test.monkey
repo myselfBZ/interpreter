@@ -1,0 +1,1 @@
+let boburmirzo = 12;
