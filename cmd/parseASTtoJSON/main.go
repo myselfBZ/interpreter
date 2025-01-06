@@ -12,7 +12,7 @@ import (
 
 func main() {
 	src := `
-        let something = 123;
+    let something = 123;
         return 2+2;
         let somethign = 34;
     `
