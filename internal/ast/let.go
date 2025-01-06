@@ -25,7 +25,7 @@ func (l *LetStatement) TokenLiteral() string {
 func (l *LetStatement) String() string {
 	var out bytes.Buffer
 	out.WriteString(l.TokenLiteral() + " ")
-	out.WriteString(l.Name.Value + "=")
+	out.WriteString(l.Name.String() + "=")
 	if l.Value != nil {
 		out.WriteString(l.Value.TokenLiteral())
 	}

@@ -1,17 +1,36 @@
 package parser
-
+// line 97
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/myselfBZ/interpreter/internal/ast"
 	"github.com/myselfBZ/interpreter/internal/lexer"
 	"github.com/myselfBZ/interpreter/internal/token"
 )
 
+const (
+    _ int = iota
+    LOWEST
+    EQUALS
+    // ==
+    LESSGREATER // > or <
+    SUM// +
+    PRODUCT// *
+    PREFIX// -X or !X
+    CALL// myFunction(X)
+)
+
+type(
+    parsePrefix func() ast.Expression
+    parseInfix func(ast.Expression) ast.Expression
+)
+
 func New(lexer *lexer.Lexer) *Parser{
     p := &Parser{lexer: lexer}
     p.currentToken = p.lexer.NextToken()
     p.peekToken = p.lexer.NextToken()
+    p.registerPrefix(token.IDENT, p.parseIdent)
     return p
 }
 
@@ -20,6 +39,8 @@ type Parser struct{
     currentToken *token.Token
     peekToken   *token.Token
     errors []string
+    parseInfixFn map[token.TokenType]parseInfix
+    parsePrefixFn map[token.TokenType]parsePrefix
 }
 
 func (p *Parser) ParseProgram() *ast.Program {
@@ -36,6 +57,9 @@ func (p *Parser) ParseProgram() *ast.Program {
             fmt.Println("error: ", v)
         }
     }
+    for _, n := range program.Statements{
+        fmt.Println(n.String())
+    }
     return program
 }
 
@@ -46,7 +70,35 @@ func (p *Parser) parseStatement(t *token.Token) ast.Statement{
     case token.RETURN:
         return p.parseReturn()
     default:
-        fmt.Printf("%s is currently not supported\n", p.currentToken.Type)
+        return nil
+    }
+}
+
+func (p *Parser) parseInt() ast.Expression {
+    number, err := strconv.Atoi(p.currentToken.Literal)
+    if err != nil{
+        p.errors = append(p.errors, fmt.Sprintf("%s is not a number\n", p.currentToken.Literal))
+        return nil
+    }
+    intNode := &ast.IntLiteral{Token: p.currentToken, Value: int64(number)}
+    return intNode
+}
+
+func (p *Parser) parseIdent() ast.Expression {
+    return &ast.Identifier{Token: p.currentToken, Value: p.currentToken.Literal}
+}
+
+func (p *Parser) parseExpressionStatements() *ast.ExpressionStatement{
+    node := &ast.ExpressionStatement{Token: p.currentToken}
+    node.Expression = p.parseExpression(LOWEST)
+    return node
+}
+
+
+func (p *Parser) parseExpression(precedence int) ast.Expression {
+    prefix := p.parsePrefixFn[p.currentToken.Type]
+    if prefix == nil{
+        p.errors = append(p.errors, fmt.Sprintf("couldn't find function for %s symbol\n", p.currentToken.Literal))
         return nil
     }
 }
@@ -86,7 +138,3 @@ func (p *Parser) parseReturn() *ast.ReturnStatement {
     return returnNode
 }
 
-func (p *Parser) nextToken() {
-    p.currentToken = p.peekToken
-    p.peekToken = p.lexer.NextToken()
-}
