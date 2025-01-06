@@ -11,11 +11,7 @@ import (
 )
 
 func main() {
-	src := `
-    let something = htllo;
-        return 2+2;
-        let somethign = 34;
-    `
+    src := `1+1;`
 	l := lexer.New(src)
 	p := parser.New(l)
 	program := p.ParseProgram()

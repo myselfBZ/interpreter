@@ -22,3 +22,16 @@ func (p *Parser) registerPrefix(t token.TokenType, f parsePrefix){
 func (p *Parser) registerInfix(t token.TokenType, f parseInfix){
     p.parseInfixFn[t] = f
 }
+
+func (p *Parser) peekPrecedence() int {
+    if p, ok := precedences[p.peekToken.Type]; ok {
+        return p
+    }
+    return LOWEST
+}
+func (p *Parser) curPrecedence() int {
+    if p, ok := precedences[p.currentToken.Type]; ok {
+        return p
+    }
+        return LOWEST
+}
