@@ -121,6 +121,7 @@ func (p *Parser) parseIdent() ast.Expression {
 func (p *Parser) parseExpressionStatements() *ast.ExpressionStatement{
     node := &ast.ExpressionStatement{Token: p.currentToken}
     node.Expression = p.parseExpression(LOWEST)
+    p.nextToken()
     return node
 }
 
