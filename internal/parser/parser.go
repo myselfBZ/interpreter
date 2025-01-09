@@ -50,6 +50,8 @@ func New(lexer *lexer.Lexer) *Parser{
     p.registerInfix(token.MINUS, p.parseInfixExpression)
     p.registerInfix(token.DIVISION, p.parseInfixExpression)
     p.registerInfix(token.MULTIPLICATION, p.parseInfixExpression)
+    p.registerInfix(token.LBRACE, p.parseInfixExpression)
+    p.registerInfix(token.RBRACE, p.parseInfixExpression)
     p.registerInfix(token.EQ, p.parseInfixExpression)
     p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
     p.registerInfix(token.LT, p.parseInfixExpression)
@@ -141,7 +143,7 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 func (p *Parser) parseExpression(precedence int) ast.Expression {
     prefix := p.parsePrefixFn[p.currentToken.Type]
     if prefix == nil{
-        p.errors = append(p.errors, fmt.Sprintf("couldn't find function for %s symbol\n", p.currentToken.Type))
+        p.errors = append(p.errors, fmt.Sprintf("having %s doesn't make sense at all\n", p.currentToken.Literal))
         return nil
     }
     left := prefix()
