@@ -60,12 +60,6 @@ func (l *Lexer) readChar() {
 	l.readPos += 1
 }
 
-// Tokenize godoc
-//
-//	@Summary		Prints out all the tokens
-//	@Description    Prints out all the tokens, remember it is just for fun, not a special function
-//	@Accept			nothing
-//	@Produce		nothing
 func (l *Lexer) Tokenize() {
 	for {
 		t := l.NextToken()
@@ -93,7 +87,7 @@ func (l *Lexer) NextToken() *token.Token {
 	case '=':
 		if l.peek() == '=' {
 			l.readChar()
-			t = token.NewToken(token.EQ, string(l.ch)+string(l.peek()))
+			t = token.NewToken(token.EQ, string(l.ch)+"=")
 		} else {
 			t = token.NewToken(token.ASSIGN, string(l.ch))
 		}

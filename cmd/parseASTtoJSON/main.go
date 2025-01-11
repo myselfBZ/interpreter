@@ -11,7 +11,13 @@ import (
 )
 
 func main() {
+<<<<<<< HEAD
     src := `if (1 > 2) { 12 } else {   12 }`
+=======
+	src := `
+    ((3+3) +3) + (12 + 21);
+    `
+>>>>>>> rewrite-parser
 	l := lexer.New(src)
 	p := parser.New(l)
 	program := p.ParseProgram()
