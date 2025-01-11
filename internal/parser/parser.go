@@ -247,17 +247,11 @@ func (p *Parser) parseBlockStatements() *ast.BlockStatement {
     var statemenst []ast.Statement
     for !p.currentTokenIs(token.RBRACE) && !p.currentTokenIs(token.EOF){
         stmnt := p.parseStatement(p.currentToken)
-        fmt.Printf("DEBUG: the statement: %s\n", stmnt.String())
         if stmnt != nil{
             statemenst = append(statemenst, stmnt)
         }
         p.nextToken()
     }
     node.Statements = statemenst
-    fmt.Printf("DEBUG: current token is: %s type:%s \n", p.currentToken.Literal, p.currentToken.Type)
-    //DEBUG
-    for _, v := range statemenst{
-        fmt.Printf("DEBUG: Token: %s\n", v.TokenLiteral())
-    }
     return node
 }
