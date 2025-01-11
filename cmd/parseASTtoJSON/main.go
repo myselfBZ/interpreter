@@ -11,7 +11,10 @@ import (
 )
 
 func main() {
-    src := `1+1*23;`
+    src := `
+    let bs = 12;
+    return 12;
+    `
 	l := lexer.New(src)
 	p := parser.New(l)
 	program := p.ParseProgram()
