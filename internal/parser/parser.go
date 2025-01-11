@@ -1,6 +1,5 @@
 package parser
 
-// line 97
 import (
 	"fmt"
 	"strconv"
@@ -42,10 +41,16 @@ func New(lexer *lexer.Lexer) *Parser{
     p := &Parser{lexer: lexer, parseInfixFn: make(map[token.TokenType]parseInfix), parsePrefixFn: make(map[token.TokenType]parsePrefix)}
     p.currentToken = p.lexer.NextToken()
     p.peekToken = p.lexer.NextToken()
+    // prefix
+    p.registerPrefix(token.IF, p.parseIfExpression)
+    p.registerPrefix(token.TRUE, p.parseBoolean)
+    p.registerPrefix(token.FALSE, p.parseBoolean)
     p.registerPrefix(token.IDENT, p.parseIdent)
     p.registerPrefix(token.INT, p.parseInt)
     p.registerPrefix(token.MINUS, p.parsePrefix)
     p.registerPrefix(token.BANG, p.parsePrefix)
+    p.registerPrefix(token.LPAREN, p.parseGroupedExpressions)
+    //infix 
     p.registerInfix(token.PLUS, p.parseInfixExpression)
     p.registerInfix(token.MINUS, p.parseInfixExpression)
     p.registerInfix(token.DIVISION, p.parseInfixExpression)
@@ -106,6 +111,10 @@ func (p *Parser) parsePrefix() ast.Expression {
     return node
 }
 
+func (p *Parser) parseBoolean() ast.Expression{
+    return &ast.Boolean{Token: p.currentToken, Value: p.currentTokenIs(token.TRUE)}
+}
+
 func (p *Parser) parseInt() ast.Expression {
     number, err := strconv.Atoi(p.currentToken.Literal)
     if err != nil{
@@ -164,7 +173,6 @@ func (p *Parser) parseLet() *ast.LetStatement{
         p.errors = append(p.errors, fmt.Sprintf("%s cannot be a name for a variable\n", p.peekToken.Literal))
         return nil
     } 
-
     
     letNode.Name = &ast.Identifier{Token:p.peekToken, Value: p.peekToken.Literal}
     p.nextToken()
@@ -194,3 +202,62 @@ func (p *Parser) parseReturn() *ast.ReturnStatement {
     return returnNode
 }
 
+func (p *Parser) parseGroupedExpressions() ast.Expression{
+    p.nextToken()
+    left := p.parseExpression(LOWEST)
+    if p.peekToken.Type != token.RPAREN{
+        p.errors = append(p.errors, fmt.Sprintf("missing the closing parentheses"))
+        return nil
+    }
+    p.nextToken()
+    return left
+}
+
+func (p *Parser) parseIfExpression() ast.Expression {
+    node := &ast.IfExpression{Token: p.currentToken}
+    p.nextToken() 
+    if p.currentToken.Type != token.LPAREN{
+        return nil
+    }
+    p.nextToken()
+    node.Condition = p.parseExpression(LOWEST)
+    p.nextToken()
+    if p.currentToken.Type != token.RPAREN{
+        return nil
+    }
+    p.nextToken()
+    if p.currentToken.Type != token.LBRACE{
+        return nil
+    }
+    p.nextToken()
+    node.Consequence = p.parseBlockStatements()
+    if p.currentToken.Type == token.ELSE{
+        p.nextToken()
+        if p.currentToken.Type != token.LBRACE{
+            return nil
+        }
+        p.nextToken()
+        node.Alternative = p.parseBlockStatements()
+    }
+    return node
+}
+
+func (p *Parser) parseBlockStatements() *ast.BlockStatement {
+    node := &ast.BlockStatement{Token: p.currentToken}
+    var statemenst []ast.Statement
+    for !p.currentTokenIs(token.RBRACE) && !p.currentTokenIs(token.EOF){
+        stmnt := p.parseStatement(p.currentToken)
+        fmt.Printf("DEBUG: the statement: %s\n", stmnt.String())
+        if stmnt != nil{
+            statemenst = append(statemenst, stmnt)
+        }
+        p.nextToken()
+    }
+    node.Statements = statemenst
+    fmt.Printf("DEBUG: current token is: %s type:%s \n", p.currentToken.Literal, p.currentToken.Type)
+    //DEBUG
+    for _, v := range statemenst{
+        fmt.Printf("DEBUG: Token: %s\n", v.TokenLiteral())
+    }
+    return node
+}

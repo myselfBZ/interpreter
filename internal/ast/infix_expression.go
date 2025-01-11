@@ -8,8 +8,8 @@ import (
 
 type InfixExperssion struct {
 	Left     Expression
+    Operator string
 	Right    Expression
-	Operator string
 	Token    *token.Token
 }
 
