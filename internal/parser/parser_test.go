@@ -229,3 +229,42 @@ func TestInfix(t *testing.T) {
     }
 }
 
+// i know it is stupid
+func TestGroupedExpressions(t *testing.T){
+    input := "(123+34) + 12;"
+    l := lexer.New(input)
+    p := New(l)
+    program := p.ParseProgram()
+    if len(program.Statements) != 1{
+        t.Fatalf("got more than 1 statements %v", len(program.Statements))
+    }
+    expressionStatement, ok := program.Statements[0].(*ast.ExpressionStatement)
+    if !ok{
+        t.Fatalf("expected expression statement got %T", program.Statements[0].(*ast.ExpressionStatement))
+    }
+    infixExpression, ok := expressionStatement.Expression.(*ast.InfixExperssion) 
+    if !ok{
+        t.Fatalf("expected infix expression got %T", expressionStatement.Expression.(*ast.InfixExperssion))
+    }
+    // check the left grouped expression
+    leftGroupedExpression, ok := infixExpression.Left.(*ast.InfixExperssion)
+    if !ok{
+        t.Fatalf("left side is not grouped got: %T ", infixExpression.Left)
+    }
+    if !testIntegerLiteral(t, leftGroupedExpression.Left, 123){
+        return
+    }
+    if leftGroupedExpression.Operator != "+"{
+        t.Fatalf("expected + got %s", leftGroupedExpression.Operator)
+    }
+    if !testIntegerLiteral(t, leftGroupedExpression.Right, 34){
+        return
+    }
+    if infixExpression.Operator != "+"{
+        t.Fatalf("expected +  got %s", infixExpression.Operator)
+    }
+    if !testIntegerLiteral(t, infixExpression.Right, 12){
+        return
+    }
+}
+

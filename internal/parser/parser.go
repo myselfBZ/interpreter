@@ -55,6 +55,7 @@ func New(l *lexer.Lexer) *Parser {
         infixFns:  make(map[token.TokenType]parseInfix),
     }
     //prefix
+    p.registerPrefix(token.LPAREN, p.parseGroupedExressions)
     p.registerPrefix(token.IDENT, p.parseIdent)
     p.registerPrefix(token.INT, p.parseInt)
     p.registerPrefix(token.MINUS, p.parsePrefixOps)
@@ -115,7 +116,7 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 		return nil
 	}
     left := prefix()
-    for !p.currentTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence(){
+    for !p.peekTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence(){
         infix := p.infixFns[p.peekToken.Type] 
         if infix == nil{
             return left
@@ -186,5 +187,12 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression{
     return node
 }
 
-
+func (p *Parser) parseGroupedExressions() ast.Expression {
+    p.nextToken()
+    exprsn := p.parseExpression(LOWEST)
+    if p.peekTokenIs(token.RPAREN){
+       p.nextToken() 
+    }
+    return exprsn
+}
 

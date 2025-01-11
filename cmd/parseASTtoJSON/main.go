@@ -12,7 +12,7 @@ import (
 
 func main() {
 	src := `
-    4 == 2
+    ((3+3) +3) + (12 + 21);
     `
 	l := lexer.New(src)
 	p := parser.New(l)
