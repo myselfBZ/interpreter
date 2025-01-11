@@ -11,10 +11,8 @@ import (
 )
 
 func main() {
-    src := `
-    123;
-    123;
-    123;
+	src := `
+    4 == 2
     `
 	l := lexer.New(src)
 	p := parser.New(l)

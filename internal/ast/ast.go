@@ -40,8 +40,6 @@ func (p *Program) TokenLiteral() string {
 	return ""
 }
 
-
-
 // ExpressionStatement
 type ExpressionStatement struct {
 	Token      *token.Token
@@ -61,7 +59,6 @@ func (e *ExpressionStatement) TokenLiteral() string {
 	return e.Token.Literal
 }
 
-
 // Identifier
 type Identifier struct {
 	Token *token.Token `json:"token"`
@@ -78,7 +75,6 @@ func (i *Identifier) TokenLiteral() string {
 	return i.Token.Literal
 }
 
-
 // infix operators
 type InfixExperssion struct {
 	Left     Expression
@@ -88,12 +84,12 @@ type InfixExperssion struct {
 }
 
 func (i *InfixExperssion) expressionNode() { return }
-func (i *InfixExperssion) String() string{
-    var out bytes.Buffer
-    out.WriteString(i.Left.String())
-    out.WriteString(i.Operator)
-    out.WriteString(i.Right.String())
-    return out.String()
+func (i *InfixExperssion) String() string {
+	var out bytes.Buffer
+	out.WriteString(i.Left.String())
+	out.WriteString(i.Operator)
+	out.WriteString(i.Right.String())
+	return out.String()
 }
 func (i *InfixExperssion) TokenLiteral() string { return i.Token.Literal }
 
@@ -111,7 +107,7 @@ func (i *IntLiteral) TokenLiteral() string {
 	return i.Token.Literal
 }
 
-// LetStatement 
+// LetStatement
 type LetStatement struct {
 	Token *token.Token `json:"token"`
 	Value Expression   `json:"value"`
@@ -161,9 +157,9 @@ func (r *ReturnStatement) statementNode() {
 
 // prefix expressions
 type PrefixExpression struct {
-	Token      *token.Token
-	Operator   string
-	Expression Expression
+	Token    *token.Token
+	Operator string
+	Right    Expression
 }
 
 func (p *PrefixExpression) expressionNode() { return }
@@ -171,7 +167,7 @@ func (p *PrefixExpression) String() string {
 	var out bytes.Buffer
 	out.WriteString("(")
 	out.WriteString(p.Operator)
-	out.WriteString(p.Expression.String())
+	out.WriteString(p.Right.String())
 	out.WriteString(")")
 	return out.String()
 }
