@@ -12,12 +12,18 @@ import (
 
 func main() {
 	src := `
-    !true;
+    if (1 + 1) { 
+        let x = 12;
+        return x;
+    } else { 
+        a;
+        y; 
+    };
     `
 	l := lexer.New(src)
 	p := parser.New(l)
 	program := p.ParseProgram()
-    log.Println(program.String())
+	log.Println(program.String())
 	programBytes, err := json.Marshal(program)
 	if err != nil {
 		log.Fatal("error marshaling the program", err)

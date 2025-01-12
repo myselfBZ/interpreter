@@ -34,16 +34,16 @@ func (p *Parser) noPrefixExpression(t token.TokenType) {
 	p.errors = append(p.errors, fmt.Sprintf("no prefix func for %s\n", t))
 }
 
-func (p *Parser) curPrecedence() int{
-    if p, ok := precedences[p.curToken.Type]; ok{
-        return p
-    }
-    return LOWEST
+func (p *Parser) curPrecedence() int {
+	if p, ok := precedences[p.curToken.Type]; ok {
+		return p
+	}
+	return LOWEST
 }
 
-func (p *Parser) peekPrecedence() int{
-    if p, ok := precedences[p.peekToken.Type]; ok{
-        return p
-    }
-    return LOWEST
+func (p *Parser) peekPrecedence() int {
+	if p, ok := precedences[p.peekToken.Type]; ok {
+		return p
+	}
+	return LOWEST
 }

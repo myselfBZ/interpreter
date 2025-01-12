@@ -186,118 +186,133 @@ func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
 	return true
 }
 
-
-
 func TestInfix(t *testing.T) {
-    input := []struct{
-        input string
-        leftValue int64        
-        operator string
-        rightValue int64
-    }{
-        {"5 + 5;", 5, "+", 5},
-        {"4 - 5;", 4, "-", 5},
-        {"4 * 5;", 4, "*", 5},
-        {"4 / 2;", 4, "/", 2},
-        {"4==2;", 4, "==", 2},
-        {"4 != 2;", 4, "!=", 2},
-    }
-    for _, tt := range input{
-        l := lexer.New(tt.input)
-        p := New(l)
-        program := p.ParseProgram()
-        if len(program.Statements) != 1{
-            t.Fatalf("wrong number of statements got %v", len(program.Statements))
-        }
-        exp, ok := program.Statements[0].(*ast.ExpressionStatement)
-        if !ok{
-            t.Fatalf("statement is not an expression statement got %T", program.Statements[0].(*ast.ExpressionStatement))
-        }
-        infixExps, ok := exp.Expression.(*ast.InfixExperssion)
-        if !ok{
-            t.Fatalf("expression of expression statement isnt infix expression got=%T", exp.Expression.(*ast.InfixExperssion))
-        }
-        if !testIntegerLiteral(t, infixExps.Left, tt.leftValue){
-            return
-        }
-        if !testIntegerLiteral(t, infixExps.Right, tt.rightValue){
-            return
-        }
-        if infixExps.Operator != tt.operator{
-            t.Fatalf("expected %s got=%s", tt.operator, infixExps.Operator)
-        }
-    }
+	input := []struct {
+		input      string
+		leftValue  int64
+		operator   string
+		rightValue int64
+	}{
+		{"5 + 5;", 5, "+", 5},
+		{"4 - 5;", 4, "-", 5},
+		{"4 * 5;", 4, "*", 5},
+		{"4 / 2;", 4, "/", 2},
+		{"4==2;", 4, "==", 2},
+		{"4 != 2;", 4, "!=", 2},
+	}
+	for _, tt := range input {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		if len(program.Statements) != 1 {
+			t.Fatalf("wrong number of statements got %v", len(program.Statements))
+		}
+		exp, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("statement is not an expression statement got %T", program.Statements[0].(*ast.ExpressionStatement))
+		}
+		infixExps, ok := exp.Expression.(*ast.InfixExperssion)
+		if !ok {
+			t.Fatalf("expression of expression statement isnt infix expression got=%T", exp.Expression.(*ast.InfixExperssion))
+		}
+		if !testIntegerLiteral(t, infixExps.Left, tt.leftValue) {
+			return
+		}
+		if !testIntegerLiteral(t, infixExps.Right, tt.rightValue) {
+			return
+		}
+		if infixExps.Operator != tt.operator {
+			t.Fatalf("expected %s got=%s", tt.operator, infixExps.Operator)
+		}
+	}
 }
 
 // i know it is stupid
-func TestGroupedExpressions(t *testing.T){
-    input := "(123+34) + 12;"
-    l := lexer.New(input)
-    p := New(l)
-    program := p.ParseProgram()
-    if len(program.Statements) != 1{
-        t.Fatalf("got more than 1 statements %v", len(program.Statements))
-    }
-    expressionStatement, ok := program.Statements[0].(*ast.ExpressionStatement)
-    if !ok{
-        t.Fatalf("expected expression statement got %T", program.Statements[0].(*ast.ExpressionStatement))
-    }
-    infixExpression, ok := expressionStatement.Expression.(*ast.InfixExperssion) 
-    if !ok{
-        t.Fatalf("expected infix expression got %T", expressionStatement.Expression.(*ast.InfixExperssion))
-    }
-    // check the left grouped expression
-    leftGroupedExpression, ok := infixExpression.Left.(*ast.InfixExperssion)
-    if !ok{
-        t.Fatalf("left side is not grouped got: %T ", infixExpression.Left)
-    }
-    if !testIntegerLiteral(t, leftGroupedExpression.Left, 123){
-        return
-    }
-    if leftGroupedExpression.Operator != "+"{
-        t.Fatalf("expected + got %s", leftGroupedExpression.Operator)
-    }
-    if !testIntegerLiteral(t, leftGroupedExpression.Right, 34){
-        return
-    }
-    if infixExpression.Operator != "+"{
-        t.Fatalf("expected +  got %s", infixExpression.Operator)
-    }
-    if !testIntegerLiteral(t, infixExpression.Right, 12){
-        return
-    }
+func TestGroupedExpressions(t *testing.T) {
+	input := "(123+34) + 12;"
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	if len(program.Statements) != 1 {
+		t.Fatalf("got more than 1 statements %v", len(program.Statements))
+	}
+	expressionStatement, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("expected expression statement got %T", program.Statements[0].(*ast.ExpressionStatement))
+	}
+	infixExpression, ok := expressionStatement.Expression.(*ast.InfixExperssion)
+	if !ok {
+		t.Fatalf("expected infix expression got %T", expressionStatement.Expression.(*ast.InfixExperssion))
+	}
+	// check the left grouped expression
+	leftGroupedExpression, ok := infixExpression.Left.(*ast.InfixExperssion)
+	if !ok {
+		t.Fatalf("left side is not grouped got: %T ", infixExpression.Left)
+	}
+	if !testIntegerLiteral(t, leftGroupedExpression.Left, 123) {
+		return
+	}
+	if leftGroupedExpression.Operator != "+" {
+		t.Fatalf("expected + got %s", leftGroupedExpression.Operator)
+	}
+	if !testIntegerLiteral(t, leftGroupedExpression.Right, 34) {
+		return
+	}
+	if infixExpression.Operator != "+" {
+		t.Fatalf("expected +  got %s", infixExpression.Operator)
+	}
+	if !testIntegerLiteral(t, infixExpression.Right, 12) {
+		return
+	}
 }
 
-func TestBoolean(t *testing.T){
-    input := []struct{
-        input string
-        value bool
-        litral string
-    }{
-        {"true;", true, "true"},
-        {"false;", false, "false"},
-    }
-    for _, tt := range input{
-        l := lexer.New(tt.input)
-        p := New(l)
-        program := p.ParseProgram()
-        if len(program.Statements) != 1{
-            t.Fatalf("there isn't one statement got %d", len(program.Statements))
-        }
-        exs, ok := program.Statements[0].(*ast.ExpressionStatement)
-        if !ok{
-            t.Fatalf("not an expression statement got: %T", program.Statements[0].(*ast.ExpressionStatement))
-        }
-        boolean, ok := exs.Expression.(*ast.Boolean)
-        if !ok{
-            t.Fatalf("not a boolean value: %T", exs.Expression.(*ast.Boolean))
-        }
-        if boolean.Value != tt.value{
-            t.Fatalf("expected %v got %v", tt.value, boolean.Value)
-        }
-        if boolean.TokenLiteral() != tt.litral{
-            t.Fatalf("falied on litral test expected %s got %s", tt.litral, boolean.TokenLiteral())
-        }
-    }
-} 
+func TestBoolean(t *testing.T) {
+	input := []struct {
+		input  string
+		value  bool
+		litral string
+	}{
+		{"true;", true, "true"},
+		{"false;", false, "false"},
+	}
+	for _, tt := range input {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		if len(program.Statements) != 1 {
+			t.Fatalf("there isn't one statement got %d", len(program.Statements))
+		}
+		exs, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("not an expression statement got: %T", program.Statements[0].(*ast.ExpressionStatement))
+		}
+		boolean, ok := exs.Expression.(*ast.Boolean)
+		if !ok {
+			t.Fatalf("not a boolean value: %T", exs.Expression.(*ast.Boolean))
+		}
+		if boolean.Value != tt.value {
+			t.Fatalf("expected %v got %v", tt.value, boolean.Value)
+		}
+		if boolean.TokenLiteral() != tt.litral {
+			t.Fatalf("falied on litral test expected %s got %s", tt.litral, boolean.TokenLiteral())
+		}
+	}
+}
 
+func testIdentifier(t *testing.T, exp ast.Expression, value string) bool {
+	ident, ok := exp.(*ast.Identifier)
+	if !ok {
+		t.Errorf("exp not *ast.Identifier. got=%T", exp)
+		return false
+	}
+	if ident.Value != value {
+		t.Errorf("ident.Value not %s. got=%s", value, ident.Value)
+		return false
+	}
+	if ident.TokenLiteral() != value {
+		t.Errorf("ident.TokenLiteral not %s. got=%s", value,
+			ident.TokenLiteral())
+		return false
+	}
+	return true
+}
