@@ -11,16 +11,13 @@ import (
 )
 
 func main() {
-<<<<<<< HEAD
-    src := `if (1 > 2) { 12 } else {   12 }`
-=======
 	src := `
-    ((3+3) +3) + (12 + 21);
+    !true;
     `
->>>>>>> rewrite-parser
 	l := lexer.New(src)
 	p := parser.New(l)
 	program := p.ParseProgram()
+    log.Println(program.String())
 	programBytes, err := json.Marshal(program)
 	if err != nil {
 		log.Fatal("error marshaling the program", err)

@@ -9,7 +9,8 @@ import (
 	"github.com/myselfBZ/interpreter/internal/token"
 )
 
-// nobody cares
+// todo: implement the parsing if expressions
+
 const (
 	_ int = iota
 	LOWEST
@@ -22,7 +23,6 @@ const (
 	CALL        // myFunction(X)
 )
 
-// let's rewrite the parser
 type (
 	parsePrefix func() ast.Expression
 	parseInfix  func(ast.Expression) ast.Expression
@@ -58,6 +58,8 @@ func New(l *lexer.Lexer) *Parser {
 	}
 	//prefix
 	p.registerPrefix(token.LPAREN, p.parseGroupedExressions)
+	p.registerPrefix(token.TRUE, p.parseBoolean)
+	p.registerPrefix(token.FALSE, p.parseBoolean)
 	p.registerPrefix(token.IDENT, p.parseIdent)
 	p.registerPrefix(token.INT, p.parseInt)
 	p.registerPrefix(token.MINUS, p.parsePrefixOps)
@@ -209,4 +211,8 @@ func (p *Parser) parseGroupedExpressions() ast.Expression {
 	}
 	p.nextToken()
 	return left
+}
+
+func (p *Parser) parseBoolean() ast.Expression {
+    return &ast.Boolean{Token: p.curToken, Value: p.currentTokenIs(token.TRUE)}
 }

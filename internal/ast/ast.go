@@ -86,9 +86,11 @@ type InfixExperssion struct {
 func (i *InfixExperssion) expressionNode() { return }
 func (i *InfixExperssion) String() string {
 	var out bytes.Buffer
+	out.WriteString("(")
 	out.WriteString(i.Left.String())
-	out.WriteString(i.Operator)
+	out.WriteString(" " + i.Operator + " ")
 	out.WriteString(i.Right.String())
+	out.WriteString(")")
 	return out.String()
 }
 func (i *InfixExperssion) TokenLiteral() string { return i.Token.Literal }
@@ -174,3 +176,25 @@ func (p *PrefixExpression) String() string {
 func (p *PrefixExpression) TokenLiteral() string {
 	return p.Token.Literal
 }
+
+
+type Boolean struct{
+    Token *token.Token
+    Value bool
+}
+
+func (b *Boolean) expressionNode() {return}
+func (b *Boolean) String() string{
+    return b.TokenLiteral()
+}
+func (b *Boolean) TokenLiteral() string{
+    return b.Token.Literal
+}
+// type IfExpression struct{
+//     Token *token.Token
+//     Consequence *BlockStatement
+//     Alternative *BlockStatement
+//     Condition  Expression
+// }
+
+

@@ -268,3 +268,36 @@ func TestGroupedExpressions(t *testing.T){
     }
 }
 
+func TestBoolean(t *testing.T){
+    input := []struct{
+        input string
+        value bool
+        litral string
+    }{
+        {"true;", true, "true"},
+        {"false;", false, "false"},
+    }
+    for _, tt := range input{
+        l := lexer.New(tt.input)
+        p := New(l)
+        program := p.ParseProgram()
+        if len(program.Statements) != 1{
+            t.Fatalf("there isn't one statement got %d", len(program.Statements))
+        }
+        exs, ok := program.Statements[0].(*ast.ExpressionStatement)
+        if !ok{
+            t.Fatalf("not an expression statement got: %T", program.Statements[0].(*ast.ExpressionStatement))
+        }
+        boolean, ok := exs.Expression.(*ast.Boolean)
+        if !ok{
+            t.Fatalf("not a boolean value: %T", exs.Expression.(*ast.Boolean))
+        }
+        if boolean.Value != tt.value{
+            t.Fatalf("expected %v got %v", tt.value, boolean.Value)
+        }
+        if boolean.TokenLiteral() != tt.litral{
+            t.Fatalf("falied on litral test expected %s got %s", tt.litral, boolean.TokenLiteral())
+        }
+    }
+} 
+
