@@ -2,7 +2,6 @@ package ast
 
 import (
 	"bytes"
-
 	"github.com/myselfBZ/interpreter/internal/token"
 )
 
@@ -229,12 +228,22 @@ func (b *BlockStatement) String() string {
 type FunctionLiteral struct{
     Token *token.Token
     Params []*Identifier
-    Statements []Statement
+    Body *BlockStatement
 }
 
 func (f *FunctionLiteral) expressionNode() {return}
 func (f *FunctionLiteral) String() string{
-    return ""
+    var out bytes.Buffer
+    out.WriteString(f.TokenLiteral() + " ")
+    out.WriteString("(")
+    for _, p := range f.Params{
+        out.WriteString(p.String())
+    }
+    out.WriteString(")")
+    for _, s := range f.Body.Statements{
+        out.WriteString(s.String())
+    }
+    return out.String()
 }
 func(f *FunctionLiteral) TokenLiteral() string {
     return f.Token.Literal

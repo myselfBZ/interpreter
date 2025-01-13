@@ -12,13 +12,9 @@ import (
 
 func main() {
 	src := `
-    if (1 + 1) { 
-        let x = 12;
-        return x;
-    } else { 
-        a;
-        y; 
-    };
+    fn (x, y, t){
+        return 23;
+    }
     `
 	l := lexer.New(src)
 	p := parser.New(l)

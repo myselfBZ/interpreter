@@ -12,7 +12,7 @@ func NewToken(kind TokenType, literal string) Token {
 }
 
 var Keywords = map[string]string{
-	"function": FUNCTION,
+	"fn": FUNCTION,
 	"if":       IF,
 	"else":     ELSE,
 	"return":   RETURN,
