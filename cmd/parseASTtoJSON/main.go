@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
@@ -12,14 +13,17 @@ import (
 
 func main() {
 	src := `
-    fn (x, y, t){
-        return 23;
+    fn (x, y, z) {
+        let x = 1 + 12 * 3
+        return z
     }
+    add(1, 3)
     `
 	l := lexer.New(src)
 	p := parser.New(l)
 	program := p.ParseProgram()
-	log.Println(program.String())
+	fmt.Println(program.String())
+    fmt.Println("Number of statements: ", len(program.Statements))
 	programBytes, err := json.Marshal(program)
 	if err != nil {
 		log.Fatal("error marshaling the program", err)

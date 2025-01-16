@@ -2,6 +2,8 @@ package ast
 
 import (
 	"bytes"
+	"strings"
+
 	"github.com/myselfBZ/interpreter/internal/token"
 )
 
@@ -108,7 +110,6 @@ func (i *IntLiteral) TokenLiteral() string {
 	return i.Token.Literal
 }
 
-// LetStatement
 type LetStatement struct {
 	Token *token.Token `json:"token"`
 	Value Expression   `json:"value"`
@@ -124,7 +125,7 @@ func (l *LetStatement) String() string {
 	out.WriteString(l.TokenLiteral() + " ")
 	out.WriteString(l.Name.String() + "=")
 	if l.Value != nil {
-		out.WriteString(l.Value.TokenLiteral())
+		out.WriteString(l.Value.String())
 	}
 	return out.String()
 }
@@ -236,16 +237,49 @@ func (f *FunctionLiteral) String() string{
     var out bytes.Buffer
     out.WriteString(f.TokenLiteral() + " ")
     out.WriteString("(")
+    params := []string{}
     for _, p := range f.Params{
-        out.WriteString(p.String())
+        params = append(params, p.String())
     }
-    out.WriteString(")")
+    out.WriteString(strings.Join(params, ", "))
+    out.WriteString(") ")
+    out.WriteString("{\n")
+    statements := []string{}
     for _, s := range f.Body.Statements{
-        out.WriteString(s.String())
+        statements = append(statements, s.String())
     }
+    out.WriteString(strings.Join(statements, "\n"))
+    out.WriteString("\n}")
     return out.String()
 }
 func(f *FunctionLiteral) TokenLiteral() string {
     return f.Token.Literal
 }
+
+
+type Call struct{
+    Token *token.Token // probably the name of the 
+    Function Expression
+    Arguments []Expression
+}
+
+func (c *Call) expressionNode() {
+    return
+}
+func (c *Call) TokenLiteral() string{
+    return c.Token.Literal
+}
+func (c *Call) String() string{
+    var out bytes.Buffer
+    out.WriteString(c.Function.String())
+    out.WriteString("(")
+    var arguemnts []string
+    for _, v := range c.Arguments{
+        arguemnts = append(arguemnts, v.String())
+    }
+    out.WriteString(strings.Join(arguemnts, ", "))
+    out.WriteString(")")
+    return out.String()
+}
+
 
