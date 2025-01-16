@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/myselfBZ/interpreter/internal/lexer"
+	"github.com/myselfBZ/interpreter/internal/parser"
 )
 
 func New() *REPL {
@@ -29,7 +30,17 @@ func (r *REPL) Start() {
 		line := r.scanner.Text()
 		if line != "" {
 			l := lexer.New(line)
-			l.Tokenize()
+            p := parser.New(l)
+            program := p.ParseProgram()
+            if len(p.Errors()) != 0{
+                fmt.Println("Woops, we ran into some monkey buisness here: ")
+                fmt.Print("     ")
+                for _, e := range p.Errors(){
+                    fmt.Println(e)
+                }
+            } else{
+                fmt.Print(program.String())
+            }
 		}
 	}
 }

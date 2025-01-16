@@ -13,11 +13,7 @@ import (
 
 func main() {
 	src := `
-    fn (x, y, z) {
-        let x = 1 + 12 * 3
-        return z
-    }
-    add(1, 3)
+    (x + 12) + 12
     `
 	l := lexer.New(src)
 	p := parser.New(l)

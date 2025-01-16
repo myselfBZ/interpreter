@@ -58,7 +58,7 @@ func New(l *lexer.Lexer) *Parser {
 		infixFns:  make(map[token.TokenType]parseInfix),
 	}
 	//prefix
-	p.registerPrefix(token.LPAREN, p.parseGroupedExressions)
+	p.registerPrefix(token.LPAREN, p.parseGroupedExpressions)
 	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral)
 	p.registerPrefix(token.TRUE, p.parseBoolean)
 	p.registerPrefix(token.FALSE, p.parseBoolean)
@@ -95,6 +95,10 @@ func (p *Parser) ParseProgram() *ast.Program {
 func (p *Parser) nextToken() {
 	p.curToken = p.peekToken
 	p.peekToken = p.lexer.NextToken()
+}
+
+func (p *Parser) Errors() []string {
+    return p.errors
 }
 
 func (p *Parser) parseStatement(t *token.Token) ast.Statement {
@@ -142,6 +146,7 @@ func (p *Parser) parseLet() ast.Statement {
 	}
 	node.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 	if !p.expectPeekToken(token.ASSIGN) {
+        p.errors = append(p.errors, fmt.Sprintf("expected '=' got %s\n", p.peekToken.Literal))
 		return nil
 	}
 	p.nextToken()
@@ -196,25 +201,16 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 	return node
 }
 
-func (p *Parser) parseGroupedExressions() ast.Expression {
+func (p *Parser) parseGroupedExpressions() ast.Expression {
 	p.nextToken()
 	exprsn := p.parseExpression(LOWEST)
-	if p.peekTokenIs(token.RPAREN) {
+	if !p.peekTokenIs(token.RPAREN) {
+        p.errors = append(p.errors, fmt.Sprintf("expected '(' . Got %s", p.curToken.Literal))
 		p.nextToken()
 	}
 	return exprsn
 }
 
-func (p *Parser) parseGroupedExpressions() ast.Expression {
-	p.nextToken()
-	left := p.parseExpression(LOWEST)
-	if p.peekToken.Type != token.RPAREN {
-		p.errors = append(p.errors, fmt.Sprintf("missing the closing parentheses"))
-		return nil
-	}
-	p.nextToken()
-	return left
-}
 
 func (p *Parser) parseBoolean() ast.Expression {
 	return &ast.Boolean{Token: p.curToken, Value: p.currentTokenIs(token.TRUE)}
@@ -223,6 +219,7 @@ func (p *Parser) parseBoolean() ast.Expression {
 func (p *Parser) parseIfExpression() ast.Expression {
 	node := &ast.IfExpression{Token: p.curToken}
 	if !p.expectPeekToken(token.LPAREN) {
+        p.errors = append(p.errors, fmt.Sprintf("expected ) got %s", p.peekToken.Literal))
 		return nil
 	}
 	p.nextToken()
