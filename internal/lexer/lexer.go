@@ -115,11 +115,21 @@ func (l *Lexer) NextToken() *token.Token {
 	case ';':
 		t = token.NewToken(token.SEMICOLON, string(l.ch))
 	case '>':
-		t = token.NewToken(token.GT, string(l.ch))
+        if l.peek() == '='{
+            l.readChar()
+            t = token.NewToken(token.GTOREQ, ">=")
+        } else{
+            t = token.NewToken(token.GT, string(l.ch))
+        }
     case ',':
         t = token.NewToken(token.COMMA, string(l.ch))
 	case '<':
-		t = token.NewToken(token.LT, string(l.ch))
+        if l.peek() == '='{
+            l.readChar()
+            t = token.NewToken(token.LTOREQ, "<=")
+        } else{
+            t = token.NewToken(token.LT, string(l.ch))
+        }
 	case 0:
 		t.Literal = ""
 		t.Type = token.EOF

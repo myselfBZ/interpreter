@@ -34,6 +34,8 @@ var precedences = map[token.TokenType]int{
 	token.MULTIPLICATION: PRODUCT,
 	token.DIVISION:       PRODUCT,
 	token.LT:             LESSGREATER,
+    token.GTOREQ:         LESSGREATER,
+    token.LTOREQ:         LESSGREATER,
 	token.GT:             LESSGREATER,
 	token.NOT_EQ:         EQUALS,
 	token.EQ:             EQUALS,
@@ -69,6 +71,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.BANG, p.parsePrefixOps)
 	//infix
     p.registerInfix(token.LPAREN, p.parseCall)
+    p.registerInfix(token.GTOREQ, p.parseInfixExpression)
+    p.registerInfix(token.LTOREQ, p.parseInfixExpression)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
 	p.registerInfix(token.MINUS, p.parseInfixExpression)
 	p.registerInfix(token.DIVISION, p.parseInfixExpression)
@@ -206,8 +210,9 @@ func (p *Parser) parseGroupedExpressions() ast.Expression {
 	exprsn := p.parseExpression(LOWEST)
 	if !p.peekTokenIs(token.RPAREN) {
         p.errors = append(p.errors, fmt.Sprintf("expected '(' . Got %s", p.curToken.Literal))
-		p.nextToken()
+        return nil
 	}
+    p.nextToken()
 	return exprsn
 }
 

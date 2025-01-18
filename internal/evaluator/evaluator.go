@@ -1,7 +1,6 @@
 package evaluator
 
 import (
-
 	"github.com/myselfBZ/interpreter/internal/ast"
 	"github.com/myselfBZ/interpreter/internal/object"
 )
@@ -28,6 +27,10 @@ func Eval(node ast.Node) object.Object{
         return FALSE
     case *ast.PrefixExpression:
         return evalPrefix(node, node.Operator)
+    case *ast.InfixExperssion:
+        right := Eval(node.Right)
+        left := Eval(node.Left)
+        return evalInfix(right, left, node.Operator)
     default:
         return NULL
     }
@@ -76,4 +79,64 @@ func evalStatements(s []ast.Statement) object.Object{
    return result
 }
 
+func evalIntInfix(right object.Object, left object.Object, oprtr string) object.Object{
+    leftValue := left.(*object.Integer).Value
+    rightValue := right.(*object.Integer).Value
+    switch oprtr{
+    case "+":
+        return &object.Integer{Value: leftValue + rightValue}
+    case "-":
+        return &object.Integer{Value: leftValue - rightValue}
+    case "*":
+        return &object.Integer{Value: leftValue * rightValue}
+    case "/":
+        return &object.Integer{Value: leftValue / rightValue}
+    case "==":
+        return &object.Boolean{Value: leftValue == rightValue}
+    case "!=":
+        return &object.Boolean{Value: leftValue != rightValue}
+    case ">=":
+        return &object.Boolean{Value: leftValue >= rightValue}
+    case "<=":
+        return &object.Boolean{Value: leftValue <= rightValue}
+    case ">":
+        return &object.Boolean{Value: leftValue > rightValue}
+    case "<":
+        return &object.Boolean{Value: leftValue < rightValue}
+    default:
+        return NULL
+    }
+}
+
+func evalInfix(right object.Object, left object.Object, oprtr string) object.Object{
+    if right.Type() == object.INTEGER_OBJ && left.Type() == object.INTEGER_OBJ{
+        return evalIntInfix(right, left, oprtr)
+    }
+    return evalBoolInfix(right, left, oprtr)
+}
+
+
+func compareBool(right object.Object, left object.Object, oprtr string) object.Object{
+    leftValue := left.(*object.Boolean).Value
+    rightValue := right.(*object.Boolean).Value
+    switch oprtr{
+    case "==":
+        return &object.Boolean{Value: leftValue == rightValue}
+    case "!=":
+        return &object.Boolean{Value: leftValue != rightValue}
+    default:
+        return NULL
+    }
+}
+
+
+func evalBoolInfix(right object.Object, left object.Object, oprtr string) object.Object{
+    if right.Type() != left.Type() {
+        return NULL
+    } 
+    if right.Type() == object.BOOLEAN_OBJ{
+        return compareBool(right, left, oprtr)
+    }
+    return NULL
+}
 

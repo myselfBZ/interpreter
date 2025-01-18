@@ -48,5 +48,7 @@ const (
 	FALSE          = "FALSE"
 	EQ             = "=="
 	NOT_EQ         = "!="
+    GTOREQ         = ">="
+    LTOREQ         = "<="
 	BANG           = "!"
 )

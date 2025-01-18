@@ -13,7 +13,7 @@ import (
 
 func main() {
 	src := `
-    +12;
+    4 / 4
     `
 	l := lexer.New(src)
 	p := parser.New(l)

@@ -50,3 +50,27 @@ func TestEvalBoolean(t *testing.T) {
     }
 }
 
+func TestBang(t *testing.T){
+    input := struct{
+        input string
+        expct bool
+    }{
+       "!true",
+       false,
+    }
+    l := lexer.New(input.input)
+    p := parser.New(l)
+    program := p.ParseProgram()
+    if len(p.Errors()) != 0{
+        t.Fatalf("errors: %s", p.Errors()[0])
+    }
+    v := Eval(program)
+    b, ok := v.(*object.Boolean)
+    if !ok{
+        t.Fatalf("expected boolean object got %T",v.(*object.Boolean))
+    }
+    if b.Value != input.expct {
+        t.Fatalf("expected %v got %v", input.expct, b.Value)
+    }
+}
+
