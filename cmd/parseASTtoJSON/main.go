@@ -13,7 +13,7 @@ import (
 
 func main() {
 	src := `
-    (x + 12) + 12
+    +12;
     `
 	l := lexer.New(src)
 	p := parser.New(l)

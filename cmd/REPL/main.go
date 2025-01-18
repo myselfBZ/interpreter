@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/myselfBZ/interpreter/internal/evaluator"
 	"github.com/myselfBZ/interpreter/internal/lexer"
 	"github.com/myselfBZ/interpreter/internal/parser"
 )
@@ -22,7 +23,7 @@ type REPL struct {
 func (r *REPL) Start() {
 	fmt.Print("Hello welcome to the Monkey programming language\n")
 	for {
-		fmt.Print(">>>")
+		fmt.Print(">>> ")
 		scanned := r.scanner.Scan()
 		if !scanned {
 			return
@@ -39,7 +40,10 @@ func (r *REPL) Start() {
                     fmt.Println(e)
                 }
             } else{
-                fmt.Print(program.String())
+                eval := evaluator.Eval(program)
+                if eval != nil{
+                    fmt.Println(eval.Inspect())
+                }
             }
 		}
 	}
