@@ -12,6 +12,13 @@ var(
 )
 
 
+func boolToBoolOBJ(b bool) *object.Boolean{
+    if b {
+        return TRUE
+    }
+    return FALSE
+}
+
 func Eval(node ast.Node) object.Object{
     switch node := node.(type){
     case *ast.Program:
@@ -92,17 +99,17 @@ func evalIntInfix(right object.Object, left object.Object, oprtr string) object.
     case "/":
         return &object.Integer{Value: leftValue / rightValue}
     case "==":
-        return &object.Boolean{Value: leftValue == rightValue}
+        return boolToBoolOBJ(leftValue == rightValue)
     case "!=":
-        return &object.Boolean{Value: leftValue != rightValue}
+        return boolToBoolOBJ(leftValue != rightValue)
     case ">=":
-        return &object.Boolean{Value: leftValue >= rightValue}
+        return boolToBoolOBJ(leftValue >= rightValue)
     case "<=":
-        return &object.Boolean{Value: leftValue <= rightValue}
+        return boolToBoolOBJ(leftValue <= rightValue)
     case ">":
-        return &object.Boolean{Value: leftValue > rightValue}
+        return boolToBoolOBJ(leftValue > rightValue)
     case "<":
-        return &object.Boolean{Value: leftValue < rightValue}
+        return boolToBoolOBJ(leftValue < rightValue)
     default:
         return NULL
     }
