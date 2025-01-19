@@ -17,6 +17,25 @@ type Object interface {
 	Inspect() string
 }
 
+func NewEnviroment() *Enviroment{
+    return &Enviroment{
+        store:make(map[string]Object),
+    }
+}
+
+type Enviroment struct{
+    store map[string]Object
+}
+
+func (e *Enviroment) Get(name string) (Object, bool) {
+    obj, ok := e.store[name]
+    return obj, ok
+}
+func (e *Enviroment) Set(name string, obj Object) Object {
+    e.store[name] = obj
+    return obj
+}
+
 type Integer struct {
 	Value int
 }
@@ -72,5 +91,7 @@ func (e *Error) Type() ObjType{
 func (e *Error) Inspect() string{
     return e.Message
 }
+
+
 
 

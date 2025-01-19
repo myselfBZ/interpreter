@@ -3,14 +3,17 @@ package main
 import (
 	"fmt"
 	"os"
-	"github.com/peterh/liner"
+
 	"github.com/myselfBZ/interpreter/internal/evaluator"
 	"github.com/myselfBZ/interpreter/internal/lexer"
+	"github.com/myselfBZ/interpreter/internal/object"
 	"github.com/myselfBZ/interpreter/internal/parser"
+	"github.com/peterh/liner"
 )
 
 
 func  Start() {
+    env := object.NewEnviroment()
     l := liner.NewLiner() 
     defer l.Close()
     l.SetCtrlCAborts(true)
@@ -40,8 +43,10 @@ func  Start() {
         lex := lexer.New(input)
         p := parser.New(lex)
         program := p.ParseProgram()
-        e := evaluator.Eval(program)
-        fmt.Println(e.Inspect())
+        e := evaluator.Eval(program, env)
+        if e != nil{
+            fmt.Println(e.Inspect())
+        }
 
     }
 }
