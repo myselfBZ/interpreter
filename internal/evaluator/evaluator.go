@@ -1,6 +1,8 @@
 package evaluator
 
 import (
+	"fmt"
+
 	"github.com/myselfBZ/interpreter/internal/ast"
 	"github.com/myselfBZ/interpreter/internal/object"
 )
@@ -16,6 +18,17 @@ func boolToBoolOBJ(b bool) *object.Boolean {
 		return TRUE
 	}
 	return FALSE
+}
+
+func newError(format string, a ...interface{}) *object.Error {
+    return &object.Error{Message: fmt.Sprintf(format, a...)}
+}
+
+func isError(o object.Object) bool{
+    if o != nil{
+        return o.Type() == object.ERROR_OBJ
+    }
+    return false
 }
 
 func Eval(node ast.Node) object.Object {
@@ -37,12 +50,18 @@ func Eval(node ast.Node) object.Object {
 		return evalPrefix(node, node.Operator)
 	case *ast.InfixExperssion:
 		right := Eval(node.Right)
+        if isError(right){
+            return right
+        }
 		left := Eval(node.Left)
 		return evalInfix(right, left, node.Operator)
     case *ast.IfExpression:
         return evalIfExp(node)
     case *ast.ReturnStatement:
         value := Eval(node.ReturnValue)
+        if isError(value){
+            return value
+        }
         return &object.ReturnValue{Value: value}
 	default:
 		return NULL
@@ -54,6 +73,9 @@ func evalProgram(node *ast.Program) object.Object {
     var result object.Object
     for _, v := range node.Statements{
         result = Eval(v)
+        if err, ok := result.(*object.Error); ok{
+            return err
+        }
         if returnV, ok := result.(*object.ReturnValue); ok{
             return returnV.Value
         }
@@ -66,6 +88,9 @@ func evalBlock(node *ast.BlockStatement) object.Object {
     var result object.Object
     for _, v := range node.Statements{
         result = Eval(v)
+        if result != nil && result.Type() == object.ERROR_OBJ{
+            return result
+        }
         if result != nil && result.Type() == object.RETURN_VALUE{
             return result
         }
@@ -75,13 +100,16 @@ func evalBlock(node *ast.BlockStatement) object.Object {
 
 func evalPrefix(node *ast.PrefixExpression, op string) object.Object {
 	v := Eval(node.Right)
+    if isError(v){
+        return v
+    }
 	switch op {
 	case "!":
 		return evalBang(v)
 	case "-":
 		return evalMinus(v)
 	default:
-		return NULL
+		return newError("can't have %s infront of %s", op,v.Type()) 
 	}
 }
 
@@ -142,7 +170,7 @@ func evalIntInfix(right object.Object, left object.Object, oprtr string) object.
 	case "<":
 		return boolToBoolOBJ(leftValue < rightValue)
 	default:
-		return NULL
+        return newError("unknown operator: %s%s%s", left.Inspect(), oprtr, right.Inspect())
 	}
 }
 
@@ -162,24 +190,27 @@ func compareBool(right object.Object, left object.Object, oprtr string) object.O
 	case "!=":
 		return &object.Boolean{Value: leftValue != rightValue}
 	default:
-		return NULL
+		return newError("unknown operator between booleans %s", oprtr)
 	}
 }
 
 func evalBoolInfix(right object.Object, left object.Object, oprtr string) object.Object {
 	if right.Type() != left.Type() {
-		return NULL
+        return newError("unknown operation with umatched types") 
 	}
 	if right.Type() == object.BOOLEAN_OBJ {
 		return compareBool(right, left, oprtr)
 	}
-	return NULL
+    return newError("unknown operator for booleans %s", oprtr) 
 }
 
 func evalIfExp(node *ast.IfExpression) object.Object {
 	conditionObj := Eval(node.Condition)
-	condition := conditionObj.(*object.Boolean).Value
-	if condition {
+	condition, ok := conditionObj.(*object.Boolean)
+    if !ok{
+        return newError("non-boolean condition in if statement %s", conditionObj.Type())
+    }
+	if condition.Value {
 		return Eval(node.Consequence)
 	}
     if node.Alternative != nil{

@@ -40,10 +40,6 @@ func  Start() {
         lex := lexer.New(input)
         p := parser.New(lex)
         program := p.ParseProgram()
-        if len(p.Errors()) != 0{
-            fmt.Println("error: ", p.Errors()[0])
-            continue
-        }
         e := evaluator.Eval(program)
         fmt.Println(e.Inspect())
 

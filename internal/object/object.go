@@ -5,10 +5,11 @@ import "fmt"
 type ObjType string
 
 const (
-	INTEGER_OBJ = "INTIGET_TYPE"
+	INTEGER_OBJ = "INTIGER_TYPE"
 	BOOLEAN_OBJ = "BOOLEAN"
 	NULL        = "NULL"
     RETURN_VALUE = "RETURN_VALUE"
+    ERROR_OBJ = "ERROR"
 )
 
 type Object interface {
@@ -59,3 +60,17 @@ func (r *ReturnValue) Type() ObjType{
 func (r *ReturnValue) Inspect() string{
     return fmt.Sprintf("%s", r.Value.Inspect())
 }
+
+
+type Error struct{
+    Message string
+}
+
+func (e *Error) Type() ObjType{
+    return ERROR_OBJ
+}
+func (e *Error) Inspect() string{
+    return e.Message
+}
+
+
