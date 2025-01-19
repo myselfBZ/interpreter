@@ -1,55 +1,55 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
-
+	"github.com/peterh/liner"
 	"github.com/myselfBZ/interpreter/internal/evaluator"
 	"github.com/myselfBZ/interpreter/internal/lexer"
 	"github.com/myselfBZ/interpreter/internal/parser"
 )
 
-func New() *REPL {
-	return &REPL{
-		scanner: bufio.NewScanner(os.Stdin),
-	}
-}
 
-type REPL struct {
-	scanner *bufio.Scanner
-}
+func  Start() {
+    l := liner.NewLiner() 
+    defer l.Close()
+    l.SetCtrlCAborts(true)
+    his := ".history"
+    if f, err := os.Open(his); err == nil{
+        l.ReadHistory(f)
+        f.Close()
+    }
 
-func (r *REPL) Start() {
-	fmt.Print("Hello welcome to the Monkey programming language\n")
-	for {
-		fmt.Print(">>> ")
-		scanned := r.scanner.Scan()
-		if !scanned {
-			return
-		}
-		line := r.scanner.Text()
-		if line != "" {
-			l := lexer.New(line)
-            p := parser.New(l)
-            program := p.ParseProgram()
-            if len(p.Errors()) != 0{
-                fmt.Println("Woops, we ran into some monkey buisness here: ")
-                fmt.Print("     ")
-                for _, e := range p.Errors(){
-                    fmt.Println(e)
-                }
-            } else{
-                eval := evaluator.Eval(program)
-                if eval != nil{
-                    fmt.Println(eval.Inspect())
-                }
+    for{
+        input, err := l.Prompt(">>> ")
+        if err != nil{
+            if err == liner.ErrPromptAborted{
+                fmt.Println("byeeee")
+                break
             }
-		}
-	}
+            fmt.Println("error: ", err)
+            break
+        }
+        if input == ""{
+            continue
+        }
+        l.AppendHistory(input)
+        if input == "exit" || input == "quit" {
+            break
+        }
+        lex := lexer.New(input)
+        p := parser.New(lex)
+        program := p.ParseProgram()
+        if len(p.Errors()) != 0{
+            fmt.Println("error: ", p.Errors()[0])
+            continue
+        }
+        e := evaluator.Eval(program)
+        fmt.Println(e.Inspect())
+
+    }
 }
 
 func main() {
-	r := New()
-	r.Start()
+    Start()
 }

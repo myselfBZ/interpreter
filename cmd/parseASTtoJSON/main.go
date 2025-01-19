@@ -13,13 +13,15 @@ import (
 
 func main() {
 	src := `
-    4 / 4
+    if (x == 212){
+        10;
+    }
     `
 	l := lexer.New(src)
 	p := parser.New(l)
 	program := p.ParseProgram()
 	fmt.Println(program.String())
-    fmt.Println("Number of statements: ", len(program.Statements))
+	fmt.Println("Number of statements: ", len(program.Statements))
 	programBytes, err := json.Marshal(program)
 	if err != nil {
 		log.Fatal("error marshaling the program", err)

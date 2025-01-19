@@ -12,13 +12,13 @@ func NewToken(kind TokenType, literal string) Token {
 }
 
 var Keywords = map[string]string{
-	"fn": FUNCTION,
-	"if":       IF,
-	"else":     ELSE,
-	"return":   RETURN,
-	"false":    FALSE,
-	"true":     TRUE,
-	"let":      LET,
+	"fn":     FUNCTION,
+	"if":     IF,
+	"else":   ELSE,
+	"return": RETURN,
+	"false":  FALSE,
+	"true":   TRUE,
+	"let":    LET,
 }
 
 const (
@@ -48,7 +48,7 @@ const (
 	FALSE          = "FALSE"
 	EQ             = "=="
 	NOT_EQ         = "!="
-    GTOREQ         = ">="
-    LTOREQ         = "<="
+	GTOREQ         = ">="
+	LTOREQ         = "<="
 	BANG           = "!"
 )

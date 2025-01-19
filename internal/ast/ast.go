@@ -26,7 +26,6 @@ type Program struct {
 	Statements []Statement
 }
 
-
 func (p *Program) String() string {
 	var out bytes.Buffer
 	for _, v := range p.Statements {
@@ -193,7 +192,7 @@ func (b *Boolean) TokenLiteral() string {
 
 type IfExpression struct {
 	Token       *token.Token
-    Condition   Expression
+	Condition   Expression
 	Consequence *BlockStatement
 	Alternative *BlockStatement
 }
@@ -217,6 +216,9 @@ type BlockStatement struct {
 }
 
 func (b *BlockStatement) statementNode() { return }
+func (b *BlockStatement) TokenLiteral() string {
+	return b.Token.Literal
+}
 func (b *BlockStatement) String() string {
 	var out bytes.Buffer
 	for _, v := range b.Statements {
@@ -225,62 +227,57 @@ func (b *BlockStatement) String() string {
 	return out.String()
 }
 
-
-
-type FunctionLiteral struct{
-    Token *token.Token
-    Params []*Identifier
-    Body *BlockStatement
+type FunctionLiteral struct {
+	Token  *token.Token
+	Params []*Identifier
+	Body   *BlockStatement
 }
 
-func (f *FunctionLiteral) expressionNode() {return}
-func (f *FunctionLiteral) String() string{
-    var out bytes.Buffer
-    out.WriteString(f.TokenLiteral() + " ")
-    out.WriteString("(")
-    params := []string{}
-    for _, p := range f.Params{
-        params = append(params, p.String())
-    }
-    out.WriteString(strings.Join(params, ", "))
-    out.WriteString(") ")
-    out.WriteString("{\n")
-    statements := []string{}
-    for _, s := range f.Body.Statements{
-        statements = append(statements, s.String())
-    }
-    out.WriteString(strings.Join(statements, "\n"))
-    out.WriteString("\n}")
-    return out.String()
+func (f *FunctionLiteral) expressionNode() { return }
+func (f *FunctionLiteral) String() string {
+	var out bytes.Buffer
+	out.WriteString(f.TokenLiteral() + " ")
+	out.WriteString("(")
+	params := []string{}
+	for _, p := range f.Params {
+		params = append(params, p.String())
+	}
+	out.WriteString(strings.Join(params, ", "))
+	out.WriteString(") ")
+	out.WriteString("{\n")
+	statements := []string{}
+	for _, s := range f.Body.Statements {
+		statements = append(statements, s.String())
+	}
+	out.WriteString(strings.Join(statements, "\n"))
+	out.WriteString("\n}")
+	return out.String()
 }
-func(f *FunctionLiteral) TokenLiteral() string {
-    return f.Token.Literal
+func (f *FunctionLiteral) TokenLiteral() string {
+	return f.Token.Literal
 }
 
-
-type Call struct{
-    Token *token.Token // probably the name of the 
-    Function Expression
-    Arguments []Expression
+type Call struct {
+	Token     *token.Token // probably the name of the
+	Function  Expression
+	Arguments []Expression
 }
 
 func (c *Call) expressionNode() {
-    return
+	return
 }
-func (c *Call) TokenLiteral() string{
-    return c.Token.Literal
+func (c *Call) TokenLiteral() string {
+	return c.Token.Literal
 }
-func (c *Call) String() string{
-    var out bytes.Buffer
-    out.WriteString(c.Function.String())
-    out.WriteString("(")
-    var arguemnts []string
-    for _, v := range c.Arguments{
-        arguemnts = append(arguemnts, v.String())
-    }
-    out.WriteString(strings.Join(arguemnts, ", "))
-    out.WriteString(")")
-    return out.String()
+func (c *Call) String() string {
+	var out bytes.Buffer
+	out.WriteString(c.Function.String())
+	out.WriteString("(")
+	var arguemnts []string
+	for _, v := range c.Arguments {
+		arguemnts = append(arguemnts, v.String())
+	}
+	out.WriteString(strings.Join(arguemnts, ", "))
+	out.WriteString(")")
+	return out.String()
 }
-
-

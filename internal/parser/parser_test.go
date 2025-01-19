@@ -317,41 +317,39 @@ func testIdentifier(t *testing.T, exp ast.Expression, value string) bool {
 	return true
 }
 
-func TestFunctionLiteral(t *testing.T){
-    input := `fn (x, y, z){
+func TestFunctionLiteral(t *testing.T) {
+	input := `fn (x, y, z){
         let b = 12;
         return 12;  
     }`
-    l := lexer.New(input)
-    p := New(l)
-    program := p.ParseProgram()
-    if len(program.Statements) != 1{
-        t.Fatalf("number of statements isn't 1 got %v", len(program.Statements))
-    }
-    exprsn, ok := program.Statements[0].(*ast.ExpressionStatement)
-    if !ok{
-        t.Fatalf("not an  expression statement got %T",program.Statements[0].(*ast.ExpressionStatement))
-    }
-    fn, ok := exprsn.Expression.(*ast.FunctionLiteral)
-    if !ok {
-        t.Fatalf("not a function got %T",exprsn.Expression.(*ast.FunctionLiteral))
-    }
-    if fn.TokenLiteral() != "fn"{
-        t.Fatalf("wrong token expected 'fn' got %s", fn.TokenLiteral())
-    }
-    if len(fn.Params) != 3{
-        t.Fatalf("wrong number of params expected 3 got %v", len(fn.Params))
-    }
-    params := []string{"x", "y", "z"}
-    for i, p := range fn.Params{
-        if p.Value != params[i]{
-            t.Fatalf("expected %s got %s", params[i], p.Value)
-        }
-    }
-    if len(fn.Body.Statements) != 2{
-        t.Fatalf("expected 2 statements in the body gott %v", len(fn.Body.Statements))
-    }    
-    // honestly, i am not quite fan of ttd. I like manual testing
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	if len(program.Statements) != 1 {
+		t.Fatalf("number of statements isn't 1 got %v", len(program.Statements))
+	}
+	exprsn, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("not an  expression statement got %T", program.Statements[0].(*ast.ExpressionStatement))
+	}
+	fn, ok := exprsn.Expression.(*ast.FunctionLiteral)
+	if !ok {
+		t.Fatalf("not a function got %T", exprsn.Expression.(*ast.FunctionLiteral))
+	}
+	if fn.TokenLiteral() != "fn" {
+		t.Fatalf("wrong token expected 'fn' got %s", fn.TokenLiteral())
+	}
+	if len(fn.Params) != 3 {
+		t.Fatalf("wrong number of params expected 3 got %v", len(fn.Params))
+	}
+	params := []string{"x", "y", "z"}
+	for i, p := range fn.Params {
+		if p.Value != params[i] {
+			t.Fatalf("expected %s got %s", params[i], p.Value)
+		}
+	}
+	if len(fn.Body.Statements) != 2 {
+		t.Fatalf("expected 2 statements in the body gott %v", len(fn.Body.Statements))
+	}
+	// honestly, i am not quite fan of ttd. I like manual testing
 }
-
-
