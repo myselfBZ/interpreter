@@ -75,6 +75,9 @@ func Eval(node ast.Node, env *object.Enviroment) object.Object {
             return newError("identifier not found %s", node.Value)
         }
         return v
+    // case *ast.FunctionLiteral:
+    //     funcEnv := object.NewEnviroment()
+    //
 	default:
 		return NULL
 	}
