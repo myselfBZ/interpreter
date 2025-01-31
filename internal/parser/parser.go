@@ -9,7 +9,6 @@ import (
 	"github.com/myselfBZ/interpreter/internal/token"
 )
 
-// todo: implement the parsing if expressions
 
 const (
 	_ int = iota

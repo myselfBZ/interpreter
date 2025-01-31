@@ -13,9 +13,7 @@ import (
 
 func main() {
 	src := `
-    if (x == 212){
-        10;
-    }
+    12;
     `
 	l := lexer.New(src)
 	p := parser.New(l)
